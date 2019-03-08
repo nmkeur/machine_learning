@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
 class rf_classifier:
-    
+
 
 # Path of the file to read. We changed the directory structure to simplify submitting to a competition
 train_file_path = '~/Desktop/kaggle_house/train.csv'

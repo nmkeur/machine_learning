@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_validate
 #from sklearn.metrics import recall_score
@@ -10,23 +10,13 @@ from sklearn import metrics
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-
-def readFile():
-    #Path to the file
-    datafile_path = '~/Downloads/counts_norm_cleaned.csv'
-    #Read the data and store data in pandas DataFrame
-    norm_data = pd.read_csv(datafile_path)
-    #Here we print a summary of the data and we print all the the column names in the dataframe.
-    #norm_data.describe()
-    #norm_data.columns
-    y_value = norm_data.patientgroup
-    #x_value = norm_data[feature_names]
-    # Select all column from the dataframe except the first (sampleID) and last (patientgroup)
-    x_value = norm_data[norm_data.columns[1:12490]]
-
-    # Split the data in train and test set.
-    x_train, x_test, y_train, y_test = train_test_split(x_value, y_value, test_size=0.4)
+class RFclass():
+    def __init__(self,kernell,cv):
+        self.x_train = ""
+        self.y_train = ""
+        self.x_test = ""
+        self.y_test = ""
+        self.kernell = kernell
 
 def featureSelection():
 
@@ -36,10 +26,6 @@ def featureSelection():
     feature_imp[:10]
 
 
-
-
-readFile()
-#This will be the value we want to predict. (patientgroup)
 
 
 # Create the list of features below
@@ -65,22 +51,6 @@ print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
 scores = cross_validate(RF_clf, x_test, y_pred,cv=5, return_train_score=False)
 scores
-
-
-
-'''
-ENSG00000125868    0.012854
-ENSG00000143198    0.012550
-ENSG00000124275    0.010922
-ENSG00000162521    0.009562
-ENSG00000178952    0.008755
-ENSG00000082212    0.007788
-ENSG00000204272    0.007495
-ENSG00000166428    0.007425
-ENSG00000169756    0.007259
-ENSG00000105369    0.007016
-dtype: float64
-'''
 
 # Creates a plot for with the feature importances.
 %matplotlib inline
