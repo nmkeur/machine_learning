@@ -3,11 +3,13 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import RepeatedStratifiedKFold
 from SVM_clf import SVMclass
+from RF_clf import RFclass
 
 #Path to the file
 class ML_TOOL():
     def __init__(self):
-        self.datafile_path = '~/Documents/machine_learning/counts_norm_cleaned.csv'
+        #self.datafile_path = '~/Documents/machine_learning/counts_norm_cleaned.csv' laptop
+        self.datafile_path = 'counts_norm_cleaned.csv'
         #Global variables, makes it easyier to debug.
         self.x_train = ""
         self.x_test = ""
@@ -25,19 +27,29 @@ class ML_TOOL():
         x_value = norm_data[norm_data.columns[1:12490]]
         # Split the data in train and test set.
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(x_value, y_value, test_size=0.3)
-        rskf = RepeatedStratifiedKFold(n_splits=2, n_repeats=2,random_state=36851234)
-        print(rskf)
         print("Train dataset has {} samples and {} attributes".format(*self.x_train.shape))
         print("Test dataset has {} samples and {} attributes".format(*self.x_test.shape))
 
 
-def startRF(args):
-        print("StartRF")
-        print(t.k)
+
+    def startRF(self,args):
+            print("StartRF")
+            RandomForestClassifier = RFclass(self.x_train, self.y_train, self.x_test, self.y_test)
 
 def startSVM(args):
     #SVMclass(args.k,args.cv)
     SVM = SVMclass(args.k)
+
+def select_kernell():
+    if kernell is "linear":
+        print("Kernell is linear")
+    elif kernell is "rbf":
+        print("Kernell is rbf")
+    elif kernell is "poly":
+        print("kernell is poly")
+    else:
+        print("Unknown kernell")
+        exit(0)
 
 def main():
     ML = ML_TOOL()
@@ -46,7 +58,7 @@ def main():
     subparsers = parser.add_subparsers()
     #Create parser for SVM
     parser_rf = subparsers.add_parser('rf')
-    parser_rf.set_defaults(func=startRF)
+    parser_rf.set_defaults(func=ML.startRF)
     parser_foo = subparsers.add_parser('svm')
     parser_foo.add_argument('-k',
                     required=True,

@@ -1,6 +1,7 @@
 # https://stackabuse.com/implementing-svm-and-kernel-svm-with-pythons-scikit-learn/
 import pandas as pd
 import numpy as np
+from Globalclassifier import SVMClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
@@ -10,27 +11,11 @@ from sklearn.model_selection import GridSearchCV
 #import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix
 
-class SVMclass():
-    def __init__(self, kernell= None, cv= 5):
-        self.x_train = ""
-        self.y_train = ""
-        self.x_test = ""
-        self.y_test = ""
+class SVMclass(SVMClassifier):
+    def __init__(self, kernell):
         self.kernell = kernell
-        self.cv = cv
-        print(self.kernell)
 
-    def select_kernell():
-        if kernell is "linear":
-            print("Kernell is linear")
-        elif kernell is "rbf":
-            print("Kernell is rbf")
-        elif kernell is "poly":
-            print("kernell is poly")
-        else:
-            print("Unknown kernell")
-            exit(0)
-            
+
     def svc_param_selection(self):
         Cs = [0.0001,0.001, 0.01, 0.1, 1, 10]
         gammas = [0.0001,0.001, 0.01, 0.1, 1]
