@@ -11,6 +11,7 @@ from sklearn.model_selection import GridSearchCV
 #import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.feature_selection import RFECV
 
 class SVMpoly(Classifier):
     def __init__(self,x_train, y_train, x_test, y_test, kernell):
@@ -24,11 +25,12 @@ class SVMpoly(Classifier):
 
         self.setupCV()
         self.svc_param_selection()
+        self.FS_rfe()
 
 
     def svc_param_selection(self):
         Cs = [0.01, 0.1, 1, 10]
-        gammas = [1e-5,1e-4, 1e-3]
+        gammas = [1e-8,1e-7,1e-6,1e-5,1e-4, 1e-3]
         param_grid = {'C': Cs, 'gamma' : gammas}
         self.SVC_cls = GridSearchCV(
                         SVC(kernel=self.kernell,random_state=1),
