@@ -10,7 +10,7 @@ from SVM_sigmoid import SVMsigmoid
 class ML_TOOL():
     def __init__(self):
         #self.datafile_path = '~/Documents/machine_learning/counts_norm_cleaned.csv' laptop
-        self.datafile_path = 'counts_norm_cleaned.csv'
+        self.datafile_path = 'norm_reads.csv'
 
         #Global variables, makes it easyier to debug.
         self.x_train = ""

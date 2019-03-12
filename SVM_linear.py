@@ -11,6 +11,7 @@ from sklearn.model_selection import GridSearchCV
 #import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn.metrics import classification_report, confusion_matrix
+from CreatePlot import CreatePlot
 
 class SVMlinear(Classifier):
     def __init__(self,x_train, y_train, x_test, y_test, kernell):
@@ -31,7 +32,7 @@ class SVMlinear(Classifier):
         gammas = [1e-6, 1e-5,1e-4, 1e-3]
         param_grid = {'C': Cs, 'gamma' : gammas}
         self.SVC_cls = GridSearchCV(
-                        SVC(kernel=self.kernell,random_state=1),
+                        SVC(kernel=self.kernell,random_state=1,probability=True),
                         param_grid, cv=self.skfold,verbose=10,n_jobs=-1)
         self.SVC_cls.fit(self.x_train,self.y_train)
 
@@ -45,7 +46,15 @@ class SVMlinear(Classifier):
         print("Classification report for the test dataset:")
         print(classification_report(self.y_test, self.y_pred))
 
-
+        CP = CreatePlot()
+        CP.plot_confusion_matrix(self.y_test, self.y_pred)
+        CP.plot_precision_recall_curve(self.SVC_cls, self.x_test , self.y_test)
+        CP.plot_roc_curve(self.SVC_cls, self.x_test , self.y_test)
+        rf = SVC(kernel=self.kernell, gamma=0.001,random_state=1)
+        CP.plot_learning_curve(rf, self.x_train , self.y_train, self.skfold)
+        # Calling Method
+        #CP.plot_grid_search(self.RF_clf.cv_results_, parameters.get('n_estimators'),parameters.get('max_features') ,
+        #                 'N Estimators', 'Max Features')
 
 
 

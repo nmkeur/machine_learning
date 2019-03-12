@@ -11,8 +11,8 @@ class Classifier():
         self.skfold = ""
 
     def setupCV(self):
-        n_folds=4
-        n_repeats=4
+        n_folds=3
+        n_repeats=2
         self.skfold = RepeatedStratifiedKFold(n_splits=n_folds,
                                               n_repeats=n_repeats,
                                               random_state=1)
