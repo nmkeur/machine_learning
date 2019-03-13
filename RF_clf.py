@@ -50,38 +50,40 @@ class RFclass(Classifier):
 
 
     def gridSearch(self):
-        parameters = {'n_estimators':[250,500,750,1000,1500,2000],# [500,1000,1500,2000]
-                      'max_features':[25,50,75,100,125,150,175,200,250,300,350,400,250,500]
+        parameters = {'n_estimators':[100,200],# [500,1000,1500,2000]
+                      'max_features':[5,10,15]
         }
-        self.RF_clf = GridSearchCV(
-            RandomForestClassifier(oob_score=True,
-                                   random_state=1,
-                                   n_jobs=-1),
-                           parameters, cv=self.skfold,verbose=1, n_jobs=-1)
-        self.RF_clf.fit(self.x_train,self.y_train)
+        scores = ['balanced_accuracy']
+        rf = RandomForestClassifier(oob_score=True,random_state=1,n_jobs=-1)
+        RF_clf = GridSearchCV(rf, parameters, cv=self.skfold,
+                                    verbose=10, n_jobs=-1)
+        RF_clf.fit(self.x_train,self.y_train)
 
         print("Best parameters found on the training dataset:")
-        print("Number of estimators: ", self.RF_clf.best_params_.get('n_estimators'))
-        print("Number of maximum features: ", self.RF_clf.best_params_.get('max_features'))
+        print("Number of estimators: ", RF_clf.best_params_.get('n_estimators'))
+        print("Number of maximum features: ", RF_clf.best_params_.get('max_features'))
 
-        self.y_pred = self.RF_clf.predict(self.x_test)
+        self.y_pred = RF_clf.predict(self.x_test)
 
         print("Accuracy:",metrics.accuracy_score(self.y_test, self.y_pred))
         print("Classification report for the test dataset:")
         print(classification_report(self.y_test, self.y_pred))
 
+        print(RF_clf)
+        #scores = cross_validate(self.RF_clf, self.x_test, self.y_pred, cv=self.skfold, return_train_score=False)
+        #print(scores)
 
         CP = CreatePlot()
-        CP.plot_confusion_matrix(self.y_test, self.y_pred)
-        CP.plot_precision_recall_curve(self.RF_clf, self.x_test , self.y_test)
-        CP.plot_roc_curve(self.RF_clf, self.x_test , self.y_test)
-        rf = RandomForestClassifier(oob_score=True,
-                               random_state=1,
-                               n_jobs=-1)
-        CP.plot_learning_curve(rf, self.x_train , self.y_train, self.skfold)
+        #CP.plot_confusion_matrix(RF_clf, self.x_train , self.y_train)
+        CP.plot_precision_recall_curve(RF_clf, self.x_test , self.y_test,self.skfold)
+        #CP.plot_roc_curve(RF_clf, self.x_test , self.y_test,self.skfold)
+        #rf = RandomForestClassifier(oob_score=True,
+        #                       random_state=1,
+        #                       n_jobs=-1)
+        #CP.plot_learning_curve(rf, self.x_train , self.y_train, self.skfold)
         # Calling Method
-        CP.plot_grid_search(self.RF_clf.cv_results_, parameters.get('n_estimators'),parameters.get('max_features') ,
-                         'N Estimators', 'Max Features')
+        #CP.plot_grid_search(RF_clf.cv_results_, parameters.get('n_estimators'),parameters.get('max_features') ,
+        #                 'N Estimators', 'Max Features')
         #                        cv=self.cv, return_train_score=True)
         #print(scores)
 # Create the list of features below

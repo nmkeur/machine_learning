@@ -13,18 +13,18 @@ class CreatePlot():
         skplt.decomposition.plot_pca_component_variance(pca)
         plt.show()
 
-    def plot_confusion_matrix(self, y_test, y_pred):
-        skplt.metrics.plot_confusion_matrix(y_test, y_pred, normalize=True)
+    def plot_confusion_matrix(self, cls, y_test, y_pred):
+        skplt.classifiers.plot_confusion_matrix_with_cv(cls, y_test, y_pred, normalize=True, do_cv=True, cv=5)
         plt.show()
 
-    def plot_precision_recall_curve(self, rf_object, x_test, y_test):
+    def plot_precision_recall_curve(self, rf_object, x_test, y_test, skfold):
         pp = rf_object.predict_proba(x_test)
-        skplt.metrics.plot_precision_recall_curve(y_test, pp)
+        skplt.classifiers.plot_precision_recall_curve_with_cv(y_test, pp,cv=skfold)
         plt.show()
 
-    def plot_roc_curve(self, rf_object, x_test, y_test):
+    def plot_roc_curve(self,rf_object, x_test, y_test, skfold):
         pp = rf_object.predict_proba(x_test)
-        skplt.metrics.plot_roc_curve(y_test, pp)
+        skplt.metrics.plot_roc_curve(y_test, pp, cv=skfold)
         plt.show()
 
     def plot_learning_curve(self, rf_object, x_test, y_test, skfold):
