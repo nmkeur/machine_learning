@@ -1,4 +1,5 @@
 from sklearn.model_selection import RepeatedStratifiedKFold
+
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore")
@@ -11,8 +12,8 @@ class Classifier():
         self.skfold = ""
 
     def setupCV(self):
-        n_folds=4
-        n_repeats=10
+        n_folds=3
+        n_repeats=2
         self.skfold = RepeatedStratifiedKFold(n_splits=n_folds,
                                               n_repeats=n_repeats,
-                                              random_state=1)
+                                              random_state=None)
