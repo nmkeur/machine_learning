@@ -27,8 +27,8 @@ class CreatePlot():
         skplt.metrics.plot_roc_curve(y_test, pp)
         plt.show()
 
-    def plot_learning_curve(self, rf_object, x_test, y_test):
-        skplt.estimators.plot_learning_curve(rf_object, x_test, y_test)
+    def plot_learning_curve(self, rf_object, x_test, y_test, skfold):
+        skplt.estimators.plot_learning_curve(rf_object, x_test, y_test, cv=skfold)
         plt.show()
 
     def plot_grid_search(self, cv_results, grid_param_1, grid_param_2, name_param_1, name_param_2):

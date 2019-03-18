@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 class ML_TOOL():
     def __init__(self):
         #self.datafile_path = '~/Documents/machine_learning/counts_norm_cleaned.csv' laptop
-        self.datafile_path = 'norm_reads.csv'
+        self.datafile_path = 'counts_norm_cleaned.csv'
 
         #Global variables, makes it easyier to debug.
         self.x_train = ""
@@ -36,7 +36,7 @@ class ML_TOOL():
         # set in a stratified manner.
         # 70% for training and the remaining to test/validate.
         x_train, x_test, self.y_train, self.y_test = train_test_split(x_value, y_value,
-                                        test_size=0.2, shuffle=True, stratify=y_value)
+                                        test_size=0.3, shuffle=True, stratify=y_value)
         scaler = StandardScaler()
         scaler.fit(x_train)
         #df_scaled = pd.DataFrame(scaler.fit_transform(x_value),

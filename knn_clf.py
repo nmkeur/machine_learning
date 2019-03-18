@@ -28,7 +28,7 @@ class KNN_clf(Classifier):
 
     def RUNknn(self):
         # construct the set of hyperparameters to tune
-        parameters = {"n_neighbors": np.arange(25, 150, 5),
+        parameters = {"n_neighbors": np.arange(2, 24, 1),
 	       "metric": ["euclidean", "cityblock"]}
         scores = ['f1']
                 # instantiate learning model (k = 3)

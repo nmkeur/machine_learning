@@ -34,14 +34,15 @@ class SVMlinear(Classifier):
         #cv = StratifiedKFold(n_splits=6, shuffle=True, random_state=i)
         #np.logspace(-10,10,num=21,base=10)
         #[1e-05,1e-04,1e-03,1e-02,0.1,1,10,100,1000]
-        parameters = {'C': np.logspace(-12,3,num=16,base=10),# [500,1000,1500,2000]
-        'gamma': np.logspace(-9,-3,num=11,base=10)}
+        #np.logspace(-12,3,num=16,base=10 has good results
+        parameters = {'C': [1,10,100,1000],# [500,1000,1500,2000]
+        'gamma': np.logspace(-6,-5,num=25,base=10)}
         #'decision_function_shape':('ovo','ovr'),
         #'shrinking':(True,False)}
 
         SVC_cls = GridSearchCV(
         SVC(kernel='rbf',random_state=1,probability=True),
-        parameters, cv=self.skfold, verbose=10,n_jobs=-1, scoring='f1')
+        parameters, cv=self.skfold, verbose=2,n_jobs=-1, scoring='f1')
         SVC_cls.fit(self.x_train,self.y_train)
 
         print("Best parameters found on the training dataset:")
@@ -55,14 +56,18 @@ class SVMlinear(Classifier):
         print(classification_report(self.y_test, y_pred))
 
         CP = CreatePlot()
-        #CP.plot_confusion_matrix(self.y_test, y_pred)
-        #CP.plot_precision_recall_curve(SVC_cls, self.x_test , self.y_test)
-        #CP.plot_roc_curve(SVC_cls, self.x_test , self.y_test)
-        #print(SVC_cls.cv_results_)
+        CP.plot_confusion_matrix(self.y_test, y_pred)
+        CP.plot_precision_recall_curve(SVC_cls, self.x_test , self.y_test)
+        CP.plot_roc_curve(SVC_cls, self.x_test , self.y_test)
+        print(SVC_cls.cv_results_)
         CP.plot_grid_search(SVC_cls.cv_results_, parameters.get('gamma'),
         parameters.get('C'), 'gamma', 'C')
-        #rf = SVC(kernel=self.kernell, gamma=0.001,random_state=1)
-        #CP.plot_learning_curve(rf, self.x_train , self.y_train, self.skfold)
+
+
+        rf = SVC(kernel=self.kernell, C=SVC_cls.best_params_.get('C'),
+                                    gamma= SVC_cls.best_params_.get('gamma'),
+                                    random_state=1)
+        CP.plot_learning_curve(rf, self.x_train , self.y_train, self.skfold)
         # Calling Method
         #CP.plot_grid_search(self.RF_clf.cv_results_, parameters.get('n_estimators'),parameters.get('max_features') ,
         #                 'N Estimators', 'Max Features')
