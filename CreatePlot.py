@@ -31,8 +31,9 @@ class CreatePlot():
         skplt.estimators.plot_learning_curve(rf_object, x_test, y_test)
         plt.show()
 
-    def plot_grid_search(self, cv_results, grid_param_1, grid_param_2, name_param_1, name_param_2):
+    def plot_grid_search(self, cv_results, grid_param_1, grid_param_2, name_param_1, name_param_2, log):
         # Get Test Scores Mean and std for each grid searchs
+
         # Based on https://stackoverflow.com/questions/37161563/how-to-graph-grid-scores-from-gridsearchcv
         scores_mean = cv_results['mean_test_score']
         scores_mean = np.array(scores_mean).reshape(len(grid_param_2),len(grid_param_1))
@@ -56,5 +57,6 @@ class CreatePlot():
         ax.set_ylabel('CV Average Score', fontsize=16)
         ax.legend(loc="best", fontsize=15)
         ax.grid('on')
-        ax.set_xscale('log')
+        if log == True:
+            ax.set_xscale('log')
         plt.show()

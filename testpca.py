@@ -4,9 +4,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import numpy as np
 
-np.logspace(-1, 0.1, num=4)
+np.logspace(2,9, num=4)
 x = np.arange(-1, 1, 0.01)
 x[-1]
+
+np.logspace(-17,1,num=20,base=10)
+
+
 scaler = StandardScaler()
 
 datafile_path = 'norm_reads.csv'

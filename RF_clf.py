@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import pickle
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -30,10 +31,20 @@ class RFclass(Classifier):
         #self.trainModel()
 
     def trainModel(self):
-        self.RF_clf = RandomForestClassifier(n_estimators=5000,oob_score=True,random_state=1)
-        self.RF_clf.fit(self.x_train,self.y_train)
-        self.y_pred = self.RF_clf.predict(self.x_test)
-        #self.scoreModel()
+        print("Train the new model with new paramters.")
+        rf = RandomForestClassifier(oob_score = True,
+                                    n_estimators = self.best_params_.get('n_estimators'),
+                                    max_features = self.best_params_.get('max_features'),
+                                    random_state=1,
+                                    n_jobs=-1)
+        rf.fit(self.x_train,self.y_train)
+        self.y_pred = rf.predict(self.x_test)
+        CreatePlot().plot_confusion_matrix(self.y_test , self.y_pred)
+        CreatePlot().plot_roc_curve(rf, self.x_test , self.y_test)
+        CreatePlot().plot_precision_recall_curve(rf, self.x_test , self.y_test)
+
+
+        self.scoreModel(rf)
         #self.predictModel()
         #self.gridSearch()
 
@@ -43,50 +54,46 @@ class RFclass(Classifier):
         feature_imp = pd.Series(clf.feature_importances_,index=X.columns).sort_values(ascending=False)
         feature_imp[:10]
 
-    def scoreModel(self):
+    def scoreModel(self,rf):
+        print("Score the model")
         print("Accuracy:",metrics.accuracy_score(self.y_test, self.y_pred))
-        self.RF_clf = RandomForestClassifier(n_estimators=self.RF_clf.best_params_.get('n_estimators'),
-                                             oob_score=True,random_state=1)
-        scores = cross_validate(self.RF_clf, self.x_test,
+        scores = cross_validate(rf, self.x_test,
                                 self.y_pred,cv=self.skfold,
                                 return_train_score=False)
         print(scores)
+        self.saveModel(rf)
 
 
     def gridSearch(self):
-        parameters = {'n_estimators':[100,200],# [500,1000,1500,2000]
-                      'max_features':[50,100,150]}
+        parameters = {'n_estimators':[250,500],# [500,1000,1500,2000]
+                      'max_features':[0.025, 0.05, 0.075, 0.1, 0.125,
+                                      0.15, 0.175,0.2, 0.225,0.25]}
+
+        print("Perform gridsearch with the following options:", parameters)
         scores = ['f1']# 'precision','recall'
 
-        CP = CreatePlot()
-        rf = RandomForestClassifier(oob_score=True,random_state=1,n_jobs=-1)
+        rf = RandomForestClassifier(oob_score=True, random_state=1, n_jobs=-1)
         for score in scores:
             clf = GridSearchCV(rf, parameters, cv=self.skfold,
-                                        verbose=1, n_jobs=-1,
-                                        scoring= score)
+                                        verbose=1, n_jobs=-1, scoring= score)
             clf.fit(self.x_train,self.y_train)
 
             print("Best parameters found on the training dataset using ",score," as metric:")
             print("Number of estimators: ", clf.best_params_.get('n_estimators'))
             print("Number of maximum features: ", clf.best_params_.get('max_features'))
-
             y_pred = clf.predict(self.x_test)
             print("Accuracy:",metrics.accuracy_score(self.y_test, y_pred))
             print("Classification report for the test dataset:")
             print(classification_report(self.y_test, y_pred))
 
-            #print(self.skfold)
-
-
-            #CP.plot_grid_search(clf.cv_results_, parameters.get('n_estimators'),
-            #                parameters.get('max_features'), 'N Estimators', 'Max Features')
-            #print(RF_clf.cv_results_)
+            CreatePlot().plot_grid_search(clf.cv_results_, parameters.get('n_estimators'),
+                            parameters.get('max_features'), 'N Estimators', 'Max Features', False)
 
             print("# Tuning hyper-parameters for %s" % score)
-
             print("Best parameters set found on development set:")
             print()
             print(clf.best_params_)
+            self.best_params_ = clf.best_params_
             print()
             print("Grid scores on development set:")
             print()
@@ -108,27 +115,20 @@ class RFclass(Classifier):
             #CP.plot_confusion_matrix(self.y_test , self.y_pred)
             #CP.plot_precision_recall_curve(RF_clf, self.x_test , self.y_test)
             #CP.plot_roc_curve(RF_clf, self.x_test , self.y_test)
-            self.RF_clf = clf
+            #self.RF_clf = clf
         # Create new classsifier, this time with optimal parameters.
-        rf = RandomForestClassifier(oob_score = True,
-                                    n_estimators = self.RF_clf.best_params_.get('n_estimators'),
-                                    max_features = self.RF_clf.best_params_.get('max_features'),
-                                    random_state=1,
-                                    n_jobs=-1)
-        rf.fit(self.x_train,self.y_train)
-        ypred = rf.predict(self.x_test)
 
         #print(self.x_train)
 
-        feature_imp = pd.Series(rf.feature_importances_,
-                                index=self.x_train.columns).sort_values(ascending=False)
+        #feature_imp = pd.Series(rf.feature_importances_,
+        #                        index=self.x_train.columns).sort_values(ascending=False)
         #feature_imp.index.name == "index"
-        feature_list = feature_imp.index.tolist()
+        #feature_list = feature_imp.index.tolist()
 
-        print(feature_list[:50])
+        #print(feature_list[:50])
 
-        self.Run2(feature_list[:50])
-
+        #self.Run2(feature_list[:50])
+        self.trainModel()
 
 
 
@@ -181,11 +181,17 @@ class RFclass(Classifier):
             #y_true, y_pred = y_test, clf.predict(X_test)
             print(classification_report(self.y_test, y_pred))
             print()
+
+
+    def saveModel(self, rf):
+        # save the model to disk
+        filename = 'finalized_model.sav'
+        pickle.dump(rf, open(filename, 'wb'))
             #print(RF_clf)
             #CP.plot_confusion_matrix(self.y_test , self.y_pred)
             #CP.plot_precision_recall_curve(RF_clf, self.x_test , self.y_test)
             #CP.plot_roc_curve(RF_clf, self.x_test , self.y_test)
-        #export_csv = (feature_imp[:250].index).to_csv ('export_dataframe.csv', header=False,) #Don't forget to add '.csv' at the end of the path
+            #export_csv = (feature_imp[:250].index).to_csv ('export_dataframe.csv', header=False,) #Don't forget to add '.csv' at the end of the path
 
 
         #for name, importance in zip(self.x_test.index(), rf.feature_importances_):

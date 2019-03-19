@@ -31,12 +31,12 @@ class ML_TOOL():
         # the first (sampleID) and last (patientgroup)
         x_value = norm_data.loc[:, norm_data.columns != 'patientgroup']
         #x_value.loc[:, norm_data.columns != 'patientgroup']
-        print(x_value.head())
+        #print(x_value.head())
         # Split and shuffles the data in train and test
         # set in a stratified manner.
         # 70% for training and the remaining to test/validate.
         x_train, x_test, self.y_train, self.y_test = train_test_split(x_value, y_value,
-                                        test_size=0.2, shuffle=True, stratify=y_value)
+                                        test_size=0.4, shuffle=True, stratify=y_value)
         scaler = StandardScaler()
         scaler.fit(x_train)
         #df_scaled = pd.DataFrame(scaler.fit_transform(x_value),
