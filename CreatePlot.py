@@ -6,29 +6,44 @@ import scikitplot as skplt
 
 
 class CreatePlot():
-    def __init__ (self):
-        pass
+    def __init__ (self, name):
+        self.name = name
 
     def plot_PCA(self, pca_object):
         skplt.decomposition.plot_pca_component_variance(pca)
         plt.show()
 
-    def plot_confusion_matrix(self, y_test, y_pred):
+    def plot_confusion_matrix(self, y_test, y_pred, save):
         skplt.metrics.plot_confusion_matrix(y_test, y_pred, normalize=True)
-        plt.show()
+        if save:
+            tt = "/confusion_plot.png"
+            path = self.name + tt
+            plt.savefig(path)
+        else:
+            plt.show()
 
-    def plot_precision_recall_curve(self, rf_object, x_test, y_test):
+    def plot_precision_recall_curve(self, rf_object, x_test, y_test, save):
         pp = rf_object.predict_proba(x_test)
         skplt.metrics.plot_precision_recall_curve(y_test, pp)
-        plt.show()
+        if save:
+            tt = "/precision_plot.png"
+            path = self.name + tt
+            plt.savefig(path)
+        else:
+            plt.show()
 
-    def plot_roc_curve(self, rf_object, x_test, y_test):
+    def plot_roc_curve(self, rf_object, x_test, y_test, save):
         pp = rf_object.predict_proba(x_test)
         skplt.metrics.plot_roc_curve(y_test, pp)
-        plt.show()
+        if save:
+            tt = "/roc_plot.png"
+            path = self.name + tt
+            plt.savefig(path)
+        else:
+            plt.show()
 
-    def plot_learning_curve(self, rf_object, x_test, y_test):
-        skplt.estimators.plot_learning_curve(rf_object, x_test, y_test)
+    def plot_learning_curve(self, rf_object, x_test, y_test, skfold):
+        skplt.estimators.plot_learning_curve(rf_object, x_test, y_test, cv=skfold)
         plt.show()
 
     def plot_grid_search(self, cv_results, grid_param_1, grid_param_2, name_param_1, name_param_2, log):

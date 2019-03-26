@@ -13,10 +13,11 @@ from sklearn import metrics
 from classifier import Classifier
 import warnings
 
-
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+#In the case you get DeprecationWarnings you can turn those off
+#warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 class RFclass(Classifier):
+    #Initialize the global variables.
     def __init__(self, x_train, y_train, x_test, y_test):
         self.x_train = x_train
         self.y_train = y_train
@@ -26,27 +27,40 @@ class RFclass(Classifier):
         self.y_pred = ""
         self.skfold = ""
         self.best_params_ = ""
+        self.name = "RF"
         self.setupCV()
         self.gridSearch()
         #self.trainModel()
 
     def trainModel(self):
-        print("Train the new model with new paramters.")
+        # Train the model with the best parameters learned in the grid search
+        print("Train the model with the best parameters on the full training dataset.")
+
+        #Initialize a Random forest model object
         rf = RandomForestClassifier(oob_score = True,
                                     n_estimators = self.best_params_.get('n_estimators'),
                                     max_features = self.best_params_.get('max_features'),
                                     random_state=1,
-                                    n_jobs=-1)
+                                    n_jobs=10)
+        #Train the Random forest model object
         rf.fit(self.x_train,self.y_train)
+        #Predict the y values using the Random forest model object
         self.y_pred = rf.predict(self.x_test)
-        CreatePlot().plot_confusion_matrix(self.y_test , self.y_pred)
-        CreatePlot().plot_roc_curve(rf, self.x_test , self.y_test)
-        CreatePlot().plot_precision_recall_curve(rf, self.x_test , self.y_test)
 
+        print("Detailed classification report:")
+        print()
+        print("The model is trained with new paramters on the full training dataset.")
+        print("The scores are computed on the full test  dataset.")
+        print()
+        print(classification_report(self.y_test, self.y_pred))
+
+        # Plot the results.
+        CP = CreatePlot(self.name)
+        CP.plot_confusion_matrix(self.y_test , self.y_pred, save=True)
+        CP.plot_roc_curve(rf, self.x_test , self.y_test, save=True)
+        CP.plot_precision_recall_curve(rf, self.x_test , self.y_test, save=True)
 
         self.scoreModel(rf)
-        #self.predictModel()
-        #self.gridSearch()
 
     def featureSelection():
         # Feature importance is a standard metric in RF and can be used for feature selection
@@ -55,7 +69,7 @@ class RFclass(Classifier):
         feature_imp[:10]
 
     def scoreModel(self,rf):
-        print("Score the model")
+        print("Scoring the model")
         print("Accuracy:",metrics.accuracy_score(self.y_test, self.y_pred))
         scores = cross_validate(rf, self.x_test,
                                 self.y_pred,cv=self.skfold,
@@ -65,15 +79,18 @@ class RFclass(Classifier):
 
 
     def gridSearch(self):
-        parameters = {'n_estimators':[250,500],# [500,1000,1500,2000]
-                      'max_features':[0.025, 0.05, 0.075, 0.1, 0.125,
-                                      0.15, 0.175,0.2, 0.225,0.25]}
+        # Start the gridsearch with the following parameters.
+        parameters = {'n_estimators':[50,100],# [500,1000,1500,2000]
+                      'max_features':[10,20,30]}
 
         print("Perform gridsearch with the following options:", parameters)
+        #Can run the the gridsearch metric specific.
+        #For now only run this for the f1 metric
         scores = ['f1']# 'precision','recall'
-
-        rf = RandomForestClassifier(oob_score=True, random_state=1, n_jobs=-1)
+        #Initialize Random forest object
+        rf = RandomForestClassifier(oob_score=True, random_state=1, n_jobs=10, max_depth=100)
         for score in scores:
+            #Setup gridsearch
             clf = GridSearchCV(rf, parameters, cv=self.skfold,
                                         verbose=1, n_jobs=-1, scoring= score)
             clf.fit(self.x_train,self.y_train)
@@ -81,53 +98,28 @@ class RFclass(Classifier):
             print("Best parameters found on the training dataset using ",score," as metric:")
             print("Number of estimators: ", clf.best_params_.get('n_estimators'))
             print("Number of maximum features: ", clf.best_params_.get('max_features'))
-            y_pred = clf.predict(self.x_test)
-            print("Accuracy:",metrics.accuracy_score(self.y_test, y_pred))
-            print("Classification report for the test dataset:")
-            print(classification_report(self.y_test, y_pred))
 
-            CreatePlot().plot_grid_search(clf.cv_results_, parameters.get('n_estimators'),
-                            parameters.get('max_features'), 'N Estimators', 'Max Features', False)
+            y_pred = clf.predict(self.x_test)
 
             print("# Tuning hyper-parameters for %s" % score)
-            print("Best parameters set found on development set:")
-            print()
+            print("Best parameters set found on development set:\n")
             print(clf.best_params_)
+            #Save the best paramters found during the grid search.
             self.best_params_ = clf.best_params_
-            print()
-            print("Grid scores on development set:")
-            print()
+
+            print("Grid scores on the train dataset:\n")
             means = clf.cv_results_['mean_test_score']
             stds = clf.cv_results_['std_test_score']
             bindex = clf.best_index_
             for mean, std, params in zip(means, stds, clf.cv_results_['params']):
                 print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
-                #print( bindex)
-            print("Detailed classification report:")
-            print()
-            print("The model is trained on the full development set.")
-            print("The scores are computed on the full evaluation set.")
-            print()
-            #y_true, y_pred = y_test, clf.predict(X_test)
-            print(classification_report(self.y_test, y_pred))
-            print()
-            #print(RF_clf)
-            #CP.plot_confusion_matrix(self.y_test , self.y_pred)
-            #CP.plot_precision_recall_curve(RF_clf, self.x_test , self.y_test)
-            #CP.plot_roc_curve(RF_clf, self.x_test , self.y_test)
-            #self.RF_clf = clf
-        # Create new classsifier, this time with optimal parameters.
 
-        #print(self.x_train)
 
-        #feature_imp = pd.Series(rf.feature_importances_,
-        #                        index=self.x_train.columns).sort_values(ascending=False)
-        #feature_imp.index.name == "index"
-        #feature_list = feature_imp.index.tolist()
+            #Create a plot with the gridsearch results.
+            CP = CreatePlot(self.name)
+            CP.plot_grid_search(clf.cv_results_, parameters.get('n_estimators'),
+                    parameters.get('max_features'), 'N Estimators', 'Max Features', False)
 
-        #print(feature_list[:50])
-
-        #self.Run2(feature_list[:50])
         self.trainModel()
 
 

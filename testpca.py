@@ -13,7 +13,7 @@ np.logspace(-17,1,num=20,base=10)
 
 scaler = StandardScaler()
 
-datafile_path = 'norm_reads.csv'
+datafile_path = "/home/nick/github/machine_learning/norm_reads.csv"
 norm_data = pd.read_csv(datafile_path, index_col=0)
 y_value = norm_data.patientgroup
 
@@ -26,6 +26,14 @@ x_value = norm_data[norm_data.columns[0:12490]]
 x_train, x_test, y_train, y_test = train_test_split(x_value, y_value,
                                         test_size=0.2, shuffle=True, stratify=y_value)
 # Fit on training set only.
+y_train
+
+
+from sklearn.model_selection import RepeatedStratifiedKFold
+rskf = RepeatedStratifiedKFold(n_splits=6, n_repeats=2,random_state=36851234)
+for train_index, test_index in rskf.split(x_train, y_train):
+    print("TRAIN:", train_index, "TEST:", test_index)
+
 
 from sklearn.datasets import load_iris
 
