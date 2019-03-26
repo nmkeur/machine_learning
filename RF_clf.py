@@ -80,8 +80,8 @@ class RFclass(Classifier):
 
     def gridSearch(self):
         # Start the gridsearch with the following parameters.
-        parameters = {'n_estimators':[50,100],# [500,1000,1500,2000]
-                      'max_features':[10,20,30]}
+        parameters = {'n_estimators':[100,200,300,400,500],# [500,1000,1500,2000]
+                      'max_features':[10,20,30,40,50,60,70,80,90,100]}
 
         print("Perform gridsearch with the following options:", parameters)
         #Can run the the gridsearch metric specific.
@@ -92,7 +92,7 @@ class RFclass(Classifier):
         for score in scores:
             #Setup gridsearch
             clf = GridSearchCV(rf, parameters, cv=self.skfold,
-                                        verbose=1, n_jobs=-1, scoring= score)
+                                        verbose=1, n_jobs=-10, scoring= score)
             clf.fit(self.x_train,self.y_train)
 
             print("Best parameters found on the training dataset using ",score," as metric:")
