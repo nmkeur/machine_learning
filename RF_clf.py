@@ -80,8 +80,8 @@ class RFclass(Classifier):
 
     def gridSearch(self):
         # Start the gridsearch with the following parameters.
-        parameters = {'n_estimators':[100,200,300,400,500],# [500,1000,1500,2000]
-                      'max_features':[10,20,30,40,50,60,70,80,90,100]}
+        parameters = {'n_estimators':[100,200],# [500,1000,1500,2000]
+                      'max_features':[10,20,30]}
 
         print("Perform gridsearch with the following options:", parameters)
         #Can run the the gridsearch metric specific.
@@ -118,7 +118,7 @@ class RFclass(Classifier):
             #Create a plot with the gridsearch results.
             CP = CreatePlot(self.name)
             CP.plot_grid_search(clf.cv_results_, parameters.get('n_estimators'),
-                    parameters.get('max_features'), 'N Estimators', 'Max Features', False)
+                    parameters.get('max_features'), 'N Estimators', 'Max Features', False, True)
 
         self.trainModel()
 
@@ -134,10 +134,10 @@ class RFclass(Classifier):
         scores = ['f1']# 'precision','recall'
 
         CP = CreatePlot()
-        rf = RandomForestClassifier(oob_score=True,random_state=1,n_jobs=-1)
+        rf = RandomForestClassifier(oob_score=True,random_state=1,n_jobs=10)
         for score in scores:
             clf = GridSearchCV(rf, parameters, cv=self.skfold,
-                                        verbose=1, n_jobs=-1,
+                                        verbose=1, n_jobs=10,
                                         scoring= score)
             clf.fit(x_train,self.y_train)
 
@@ -177,7 +177,7 @@ class RFclass(Classifier):
 
     def saveModel(self, rf):
         # save the model to disk
-        filename = 'finalized_model.sav'
+        filename = 'RF/finalized_model.sav'
         pickle.dump(rf, open(filename, 'wb'))
             #print(RF_clf)
             #CP.plot_confusion_matrix(self.y_test , self.y_pred)

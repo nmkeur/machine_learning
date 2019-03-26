@@ -46,7 +46,7 @@ class CreatePlot():
         skplt.estimators.plot_learning_curve(rf_object, x_test, y_test, cv=skfold)
         plt.show()
 
-    def plot_grid_search(self, cv_results, grid_param_1, grid_param_2, name_param_1, name_param_2, log):
+    def plot_grid_search(self, cv_results, grid_param_1, grid_param_2, name_param_1, name_param_2, log, save):
         # Get Test Scores Mean and std for each grid searchs
 
         # Based on https://stackoverflow.com/questions/37161563/how-to-graph-grid-scores-from-gridsearchcv
@@ -74,4 +74,9 @@ class CreatePlot():
         ax.grid('on')
         if log == True:
             ax.set_xscale('log')
-        plt.show()
+        if save:
+            tt = "/gridSearch_plot.png"
+            path = self.name + tt
+            plt.savefig(path)
+        else:
+            plt.show()

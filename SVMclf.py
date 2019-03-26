@@ -13,6 +13,7 @@ from sklearn import metrics
 from sklearn.metrics import classification_report, confusion_matrix
 from CreatePlot import CreatePlot
 from sklearn.model_selection import StratifiedKFold
+import pickle
 
 class SVM(Classifier):
     def __init__(self,x_train, y_train, x_test, y_test):
@@ -36,8 +37,7 @@ class SVM(Classifier):
         SVM = SVC(kernel='rbf',probability=True,
                   C= self.best_params_.get('C'),
                   gamma = self.best_params_.get('gamma'),
-                  random_state=1,
-                  n_jobs=-1)
+                  random_state=1)
 
         #Train the Random forest model object
         SVM.fit(self.x_train,self.y_train)
@@ -51,12 +51,12 @@ class SVM(Classifier):
         print()
         print(classification_report(self.y_test, self.y_pred))
 
-        CP = Createplot(self.name)
+        CP = CreatePlot(self.name)
         # Plot the results.
         CP.plot_confusion_matrix(self.y_test , self.y_pred, save=True)
         CP.plot_roc_curve(SVM, self.x_test , self.y_test,save=True)
         CP.plot_precision_recall_curve(SVM, self.x_test , self.y_test, save=True)
-
+        self.saveModel(SVM)
         #self.scoreModel()
 
     def grid_search(self):
@@ -67,15 +67,13 @@ class SVM(Classifier):
         #[1e-05,1e-04,1e-03,1e-02,0.1,1,10,100,1000]
         #np.logspace(-12,3,num=16,base=10 has good results
         parameters = {'C': [25,50,100,200,250],
-        'gamma': np.logspace(-6,-5,num=10,base=10)}
-        parameters2 = {'C': [25,50],
-        'gamma': np.logspace(-6,-5,num=4,base=10)}
+        'gamma': np.logspace(-6,-5,num=15,base=10)}
         print("Perform gridsearch with the following options:", parameters)
         SVM = SVC(kernel='rbf',random_state=1,probability=True)
         for score in scores:
             SVC_cls = GridSearchCV(SVM,
-                        parameters2, cv=self.skfold,
-                         verbose=1,n_jobs=-1, scoring='f1')
+                        parameters, cv=self.skfold,
+                         verbose=1,n_jobs=10, scoring='f1')
 
             SVC_cls.fit(self.x_train,self.y_train)
 
@@ -102,8 +100,14 @@ class SVM(Classifier):
 
             #Create a plot with the gridsearch results.
             CP.plot_grid_search(SVC_cls.cv_results_, parameters.get('gamma'),
-                    parameters.get('C'), 'gamma', 'C', True)
+                    parameters.get('C'), 'gamma', 'C', True, True)
         self.trainModel()
+
+
+    def saveModel(self, svm):
+        # save the model to disk
+        filename = 'SVM/finalized_model.sav'
+        pickle.dump(svm, open(filename, 'wb'))
         #self.trainModel()
 #svclassifierlinear = SVC(kernel='linear')
 #svclassifierlinear.fit(x_train, y_train)
