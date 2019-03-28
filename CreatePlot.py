@@ -8,6 +8,9 @@ import scikitplot as skplt
 class CreatePlot():
     def __init__ (self, name):
         self.name = name
+        manager = plt.get_current_fig_manager()
+        manager.resize(*manager.window.maxsize())
+
 
     def plot_PCA(self, pca_object):
         skplt.decomposition.plot_pca_component_variance(pca)

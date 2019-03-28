@@ -184,45 +184,4 @@ class RFclass(Classifier):
             #CP.plot_precision_recall_curve(RF_clf, self.x_test , self.y_test)
             #CP.plot_roc_curve(RF_clf, self.x_test , self.y_test)
             #export_csv = (feature_imp[:250].index).to_csv ('export_dataframe.csv', header=False,) #Don't forget to add '.csv' at the end of the path
-
-
-        #for name, importance in zip(self.x_test.index(), rf.feature_importances_):
-        #    print(name, "=", importance)
-        #scores = cross_validate(rf , self.x_test, self.y_test, cv=self.skfold, scoring='f1',
-                                #return_estimator=True ,return_train_score=False)
-        #print(scores)
-
-        #CP.plot_confusion_matrix(self.y_test , ypred)
-        #P.plot_precision_recall_curve(rf, self.x_test , self.y_test)
-        #CP.plot_roc_curve(rf, self.x_test , self.y_test)
-
-        #CP.plot_learning_curve(rf, self.x_train , self.y_train)
-        # Calling Method
-
-                            #cv=self.cv, return_train_score=True)
-        #print(scores)
-# Create the list of features below
-#feature_names = ["ENSG00000125868","ENSG00000143198","ENSG00000124275","ENSG00000162521","ENSG00000178952","ENSG00000082212","ENSG00000204272","ENSG00000166428","ENSG00000169756","ENSG00000105369"]
-# select data corresponding to features in feature_names
-
-
-
-
-#Train the model using the training sets y_pred=clf.predict(X_test)
-
-
-#Predict the Y variable on the test dataset using the trained model.
-#Show the scores with cross validation set to  5
-
-
-
-
-# Creates a plot for with the feature importances.
-#%matplotlib inline
-# Creating a bar plot
-#sns.barplot(x=feature_imp[:10], y=feature_imp[:10].index)
-# Add labels to your graph
-#plt.xlabel('Feature Importance Score')
-#plt.ylabel('Features')
-#plt.title("Visualizing Important Features")
-#plt.show()
+            

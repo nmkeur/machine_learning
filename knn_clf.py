@@ -2,6 +2,7 @@ from classifier import Classifier
 from sklearn import *
 import pandas as pd
 from sklearn import metrics
+from CreatePlot import CreatePlot
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import cross_val_score
@@ -22,38 +23,63 @@ class KNN_clf(Classifier):
         self.best_params_ = ""
         self.name = "KNN"
         self.setupCV()
-        self.RUNknn()
+        self.gridSearch()
         #self.gridSearch()
         #self.trainModel()
 
+    def trainModel(self):
+        # Train the model with the best parameters learned in the grid search
+        print("Train the model with the best parameters on the full training dataset.")
 
-    def RUNknn(self):
+        #Initialize a Random forest model object
+        knn_model = KNeighborsClassifier(n_neighbors= self.best_params_.get('n_neighbors'),
+                  metric = self.best_params_.get('metric'),
+                  random_state=1)
+
+        #Train the Random forest model object
+        knn_model.fit(self.x_train,self.y_train)
+        #Predict the y values using the Random forest model object
+        self.y_pred = knn_model.predict(self.x_test)
+
+        print("Detailed classification report:")
+        print()
+        print("The model is trained with new paramters on the full training dataset.")
+        print("The scores are computed on the full test  dataset.")
+        print()
+        print(classification_report(self.y_test, self.y_pred))
+
+        CP = CreatePlot(self.name)
+        # Plot the results.
+        CP.plot_confusion_matrix(self.y_test , self.y_pred, save=True)
+        CP.plot_roc_curve(SVM, self.x_test , self.y_test,save=True)
+        CP.plot_precision_recall_curve(SVM, self.x_test , self.y_test, save=True)
+        self.saveModel(knn_model)
+        #self.scoreModel()
+
+
+    def gridSearch(self):
+        CP = CreatePlot(self.name)
         # construct the set of hyperparameters to tune
-        parameters = {"n_neighbors": np.arange(2, 24, 1),
-	       "metric": ["euclidean", "cityblock"]}
+        parameters = {"n_neighbors": np.arange(4, 20, 1),
+	       "p": [1,2,3,4,5]}
         scores = ['f1']
                 # instantiate learning model (k = 3)
         knn_model = KNeighborsClassifier()
         for score in scores:
-            clf = GridSearchCV(knn_model, parameters, cv=self.skfold,
-                                        verbose=25, n_jobs=-1,
+            clf = GridSearchCV(knn_model, parameters, cv=2,
+                                        verbose=1, n_jobs=-1,
                                         scoring= score)
             clf.fit(self.x_train,self.y_train)
 
             print("Best parameters found on the training dataset using ",score," as metric:")
-            print("Number of estimators: ", clf.best_params_.get('n_estimators'))
-            print("Number of maximum features: ", clf.best_params_.get('max_features'))
+            print("Number of neigbours: ", clf.best_params_.get('n_neighbours'))
+            print("Metric used: ", clf.best_params_.get('p'))
 
             y_pred = clf.predict(self.x_test)
-            print("Accuracy:",metrics.accuracy_score(self.y_test, y_pred))
-            print("Classification report for the test dataset:")
-            print(classification_report(self.y_test, y_pred))
-
-            #print(self.skfold)
 
 
-            #CP.plot_grid_search(clf.cv_results_, parameters.get('n_estimators'),
-            #                parameters.get('max_features'), 'N Estimators', 'Max Features')
+            CP.plot_grid_search(clf.cv_results_, parameters.get('n_neighbors'),
+                    parameters.get('p'), 'n_neighbors', 'Metric', False, True)
             #print(RF_clf.cv_results_)
 
             print("# Tuning hyper-parameters for %s" % score)
@@ -70,48 +96,11 @@ class KNN_clf(Classifier):
             for mean, std, params in zip(means, stds, clf.cv_results_['params']):
                 print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
                 #print( bindex)
-            print("Detailed classification report:")
-            print()
-            print("The model is trained on the full development set.")
-            print("The scores are computed on the full evaluation set.")
-            print()
-            #y_true, y_pred = y_test, clf.predict(X_test)
-            print(classification_report(self.y_test, y_pred))
-            print()
-            #print(RF_clf)
-            #CP.plot_confusion_matrix(self.y_test , self.y_pred)
-            #CP.plot_precision_recall_curve(RF_clf, self.x_test , self.y_test)
-            #CP.plot_roc_curve(RF_clf, self.x_test , self.y_test)
-            self.RF_clf = clf
-        # Create new classsifier, this time with optimal parameters.
-        #rf = KNeighborsClassifier(oob_score = True,
-        #                            n_estimators = self.RF_clf.best_params_.get('n_estimators'),
-        #                            max_features = self.RF_clf.best_params_.get('max_features'),
-        #                            random_state=1,
-        #                            n_jobs=-1)
-        #rf.fit(self.x_train,self.y_train)
-        #ypred = rf.predict(self.x_test)
 
-        # fit the model
-        knn_model.fit(self.x_train, self.y_train)
-        # Accuracy
-        knn_model.score(self.x_train, self.y_train)
+            #self.trainModel()
 
+    def saveModel(self, rf):
+        # save the model to disk
+        filename = 'KNN/finalized_model.sav'
+        pickle.dump(rf, open(filename, 'wb'))
         # Predictions/probs on the test dataset
-        predicted = pd.DataFrame(knn_model.predict(self.x_test))
-        probs = pd.DataFrame(knn_model.predict_proba(self.x_test))
-
-        # Store metrics
-        knn_accuracy = metrics.accuracy_score(self.y_test, predicted)
-        knn_roc_auc = metrics.roc_auc_score(self.y_test, probs[1])
-        knn_confus_matrix = metrics.confusion_matrix(self.y_test, predicted)
-        knn_classification_report = metrics.classification_report(self.y_test, predicted)
-        knn_precision = metrics.precision_score(self.y_test, predicted, pos_label=1)
-        knn_recall = metrics.recall_score(self.y_test, predicted, pos_label=1)
-        knn_f1 = metrics.f1_score(self.y_test, predicted, pos_label=1)
-
-        print(knn_classification_report)
-        # Evaluate the model using 10-fold cross-validation
-        knn_cv_scores = cross_val_score(KNeighborsClassifier(n_neighbors=3), self.x_test,
-                                        self.y_test, scoring='precision', cv=10)
-        knn_cv_mean = np.mean(knn_cv_scores)
