@@ -19,8 +19,8 @@ class ML_TOOL():
 
     def readFile(self):
         #Read the data and store data in pandas DataFrame
-        datafile_path_test = 't_normalised_filter_test(0.4_4).csv'
-        datafile_path_train = 't_normalised_filter_train(0.4_4).csv'
+        datafile_path_test = 't_normalised_filter_test(0.8_1).csv'
+        datafile_path_train = 't_normalised_filter_train(0.8_1).csv'
         test_data = pd.read_csv(datafile_path_test, index_col=0, delimiter=";")
         train_data = pd.read_csv(datafile_path_train, index_col=0, delimiter=";")
 

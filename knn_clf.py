@@ -9,6 +9,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import classification_report, confusion_matrix
 import numpy as np
+import pickle
 
 
 class KNN_clf(Classifier):
@@ -33,8 +34,7 @@ class KNN_clf(Classifier):
 
         #Initialize a Random forest model object
         knn_model = KNeighborsClassifier(n_neighbors= self.best_params_.get('n_neighbors'),
-                  metric = self.best_params_.get('metric'),
-                  random_state=1)
+                  p = self.best_params_.get('p'))
 
         #Train the Random forest model object
         knn_model.fit(self.x_train,self.y_train)
@@ -51,8 +51,8 @@ class KNN_clf(Classifier):
         CP = CreatePlot(self.name)
         # Plot the results.
         CP.plot_confusion_matrix(self.y_test , self.y_pred, save=True)
-        CP.plot_roc_curve(SVM, self.x_test , self.y_test,save=True)
-        CP.plot_precision_recall_curve(SVM, self.x_test , self.y_test, save=True)
+        CP.plot_roc_curve(knn_model, self.x_test , self.y_test,save=True)
+        CP.plot_precision_recall_curve(knn_model, self.x_test , self.y_test, save=True)
         self.saveModel(knn_model)
         #self.scoreModel()
 
@@ -60,13 +60,13 @@ class KNN_clf(Classifier):
     def gridSearch(self):
         CP = CreatePlot(self.name)
         # construct the set of hyperparameters to tune
-        parameters = {"n_neighbors": np.arange(4, 20, 1),
-	       "p": [1,2,3,4,5]}
+        parameters = {"n_neighbors": np.arange(4, 14, 1),
+	       "p": [1,2,3,4]}
         scores = ['f1']
                 # instantiate learning model (k = 3)
         knn_model = KNeighborsClassifier()
         for score in scores:
-            clf = GridSearchCV(knn_model, parameters, cv=2,
+            clf = GridSearchCV(knn_model, parameters, cv=self.skfold,
                                         verbose=1, n_jobs=-1,
                                         scoring= score)
             clf.fit(self.x_train,self.y_train)
@@ -79,25 +79,24 @@ class KNN_clf(Classifier):
 
 
             CP.plot_grid_search(clf.cv_results_, parameters.get('n_neighbors'),
-                    parameters.get('p'), 'n_neighbors', 'Metric', False, True)
-            #print(RF_clf.cv_results_)
+                    parameters.get('p'), 'n_neighbors', 'P', False, True)
 
             print("# Tuning hyper-parameters for %s" % score)
 
             print("Best parameters set found on development set:")
             print()
             print(clf.best_params_)
+            self.best_params_ = clf.best_params_
             print()
             print("Grid scores on development set:")
             print()
             means = clf.cv_results_['mean_test_score']
             stds = clf.cv_results_['std_test_score']
-            bindex = clf.best_index_
+            #bindex = clf.best_index_
             for mean, std, params in zip(means, stds, clf.cv_results_['params']):
                 print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
-                #print( bindex)
 
-            #self.trainModel()
+            self.trainModel()
 
     def saveModel(self, rf):
         # save the model to disk
