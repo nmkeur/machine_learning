@@ -1,0 +1,77 @@
+Train dataset has 322 samples and 7309 attributes
+Test dataset has 135 samples and 7309 attributes
+Start KNN algorithm
+Fitting 50 folds for each of 40 candidates, totalling 2000 fits
+[Parallel(n_jobs=-1)]: Using backend LokyBackend with 4 concurrent workers.
+[Parallel(n_jobs=-1)]: Done  42 tasks      | elapsed:   28.3s
+[Parallel(n_jobs=-1)]: Done 192 tasks      | elapsed: 16.0min
+[Parallel(n_jobs=-1)]: Done 442 tasks      | elapsed: 35.3min
+[Parallel(n_jobs=-1)]: Done 792 tasks      | elapsed: 68.3min
+[Parallel(n_jobs=-1)]: Done 1242 tasks      | elapsed: 108.9min
+[Parallel(n_jobs=-1)]: Done 1792 tasks      | elapsed: 157.5min
+[Parallel(n_jobs=-1)]: Done 2000 out of 2000 | elapsed: 175.2min finished
+Best parameters found on the training dataset using  f1  as metric:
+Number of neigbours:  None
+Metric used:  1
+# Tuning hyper-parameters for f1
+Best parameters set found on development set:
+
+{'n_neighbors': 7, 'p': 1}
+
+Grid scores on development set:
+
+0.592 (+/-0.198) for {'n_neighbors': 4, 'p': 1}
+0.547 (+/-0.220) for {'n_neighbors': 4, 'p': 2}
+0.544 (+/-0.219) for {'n_neighbors': 4, 'p': 3}
+0.533 (+/-0.189) for {'n_neighbors': 4, 'p': 4}
+0.695 (+/-0.157) for {'n_neighbors': 5, 'p': 1}
+0.635 (+/-0.193) for {'n_neighbors': 5, 'p': 2}
+0.627 (+/-0.182) for {'n_neighbors': 5, 'p': 3}
+0.629 (+/-0.195) for {'n_neighbors': 5, 'p': 4}
+0.639 (+/-0.187) for {'n_neighbors': 6, 'p': 1}
+0.575 (+/-0.212) for {'n_neighbors': 6, 'p': 2}
+0.554 (+/-0.219) for {'n_neighbors': 6, 'p': 3}
+0.547 (+/-0.221) for {'n_neighbors': 6, 'p': 4}
+0.712 (+/-0.156) for {'n_neighbors': 7, 'p': 1}
+0.649 (+/-0.153) for {'n_neighbors': 7, 'p': 2}
+0.623 (+/-0.190) for {'n_neighbors': 7, 'p': 3}
+0.625 (+/-0.181) for {'n_neighbors': 7, 'p': 4}
+0.651 (+/-0.184) for {'n_neighbors': 8, 'p': 1}
+0.598 (+/-0.165) for {'n_neighbors': 8, 'p': 2}
+0.570 (+/-0.197) for {'n_neighbors': 8, 'p': 3}
+0.569 (+/-0.211) for {'n_neighbors': 8, 'p': 4}
+0.711 (+/-0.161) for {'n_neighbors': 9, 'p': 1}
+0.650 (+/-0.148) for {'n_neighbors': 9, 'p': 2}
+0.629 (+/-0.173) for {'n_neighbors': 9, 'p': 3}
+0.632 (+/-0.196) for {'n_neighbors': 9, 'p': 4}
+0.648 (+/-0.161) for {'n_neighbors': 10, 'p': 1}
+0.604 (+/-0.184) for {'n_neighbors': 10, 'p': 2}
+0.590 (+/-0.181) for {'n_neighbors': 10, 'p': 3}
+0.588 (+/-0.207) for {'n_neighbors': 10, 'p': 4}
+0.689 (+/-0.143) for {'n_neighbors': 11, 'p': 1}
+0.664 (+/-0.172) for {'n_neighbors': 11, 'p': 2}
+0.642 (+/-0.187) for {'n_neighbors': 11, 'p': 3}
+0.640 (+/-0.189) for {'n_neighbors': 11, 'p': 4}
+0.646 (+/-0.152) for {'n_neighbors': 12, 'p': 1}
+0.632 (+/-0.178) for {'n_neighbors': 12, 'p': 2}
+0.611 (+/-0.187) for {'n_neighbors': 12, 'p': 3}
+0.588 (+/-0.177) for {'n_neighbors': 12, 'p': 4}
+0.690 (+/-0.142) for {'n_neighbors': 13, 'p': 1}
+0.686 (+/-0.167) for {'n_neighbors': 13, 'p': 2}
+0.658 (+/-0.186) for {'n_neighbors': 13, 'p': 3}
+0.634 (+/-0.184) for {'n_neighbors': 13, 'p': 4}
+Train the model with the best parameters on the full training dataset.
+Detailed classification report:
+
+The model is trained with new paramters on the full training dataset.
+The scores are computed on the full test  dataset.
+
+              precision    recall  f1-score   support
+
+           0       0.83      0.92      0.87        79
+           1       0.87      0.73      0.80        56
+
+   micro avg       0.84      0.84      0.84       135
+   macro avg       0.85      0.83      0.84       135
+weighted avg       0.85      0.84      0.84       135
+
